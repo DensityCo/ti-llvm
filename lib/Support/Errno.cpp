@@ -20,10 +20,6 @@
 #include <errno.h>
 #endif
 
-#ifdef _SYS_BIOS
-#undef HAVE_STRERROR_R
-#endif
-
 //===----------------------------------------------------------------------===//
 //=== WARNING: Implementation here must contain only TRULY operating system
 //===          independent code.

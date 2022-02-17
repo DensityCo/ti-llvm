@@ -62,11 +62,7 @@ namespace llvm {
 using namespace sys;
 ThreadLocalImpl::ThreadLocalImpl() : data() { }
 ThreadLocalImpl::~ThreadLocalImpl() { }
-#ifndef _SYS_BIOS
 void ThreadLocalImpl::setInstance(const void* d) { data = const_cast<void*>(d);}
-#else
-void ThreadLocalImpl::setInstance(const void* d) { *((void **)&data) = const_cast<void*>(d);}
-#endif
 void *ThreadLocalImpl::getInstance() { return data; }
 void ThreadLocalImpl::removeInstance() { setInstance(0); }
 }

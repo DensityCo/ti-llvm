@@ -33,12 +33,8 @@ using namespace sys;
 /// first time it was called. However, we arrange to have it called during the
 /// startup of the process to get approximately correct results.
 static TimeValue getElapsedWallTime() {
-#ifndef _SYS_BIOS
   static TimeValue &StartTime = *new TimeValue(TimeValue::now());
   return TimeValue::now() - StartTime;
-#else
-  return TimeValue ( 0,0 );
-#endif
 }
 
 /// \brief A special global variable to ensure we call \c getElapsedWallTime
@@ -93,9 +89,6 @@ static const char colorcodes[2][2][8][10] = {
  { ALLCOLORS("3",""), ALLCOLORS("3","1;") },
  { ALLCOLORS("4",""), ALLCOLORS("4","1;") }
 };
-#ifdef _SYS_BIOS
-#include "Bios/Process.inc"
-#else
 
 // Include the platform-specific parts of this class.
 #ifdef LLVM_ON_UNIX
@@ -103,5 +96,4 @@ static const char colorcodes[2][2][8][10] = {
 #endif
 #ifdef LLVM_ON_WIN32
 #include "Windows/Process.inc"
-#endif
 #endif

@@ -26,11 +26,9 @@ using namespace sys;
 }
 
 // Include the platform-specific parts of this class.
-#ifndef _SYS_BIOS
 #ifdef LLVM_ON_UNIX
 #include "Unix/Signals.inc"
 #endif
 #ifdef LLVM_ON_WIN32
 #include "Windows/Signals.inc"
-#endif
 #endif

@@ -164,11 +164,7 @@ static std::string toStringAPFloat(uint64_t D, int E, unsigned Precision) {
 
   // Find a new E, but don't let it increase past MaxScale.
   int LeadingZeros = ScaledNumberBase::countLeadingZeros64(D);
-#ifdef _SYS_BIOS
-  int NewE = std::min(ScaledNumbers::MaxScale, (long int)(E + 63 - LeadingZeros));
-#else
-    int NewE = std::min(ScaledNumbers::MaxScale,(E + 63 - LeadingZeros));
-#endif
+  int NewE = std::min(ScaledNumbers::MaxScale, E + 63 - LeadingZeros);
   int Shift = 63 - (NewE - E);
   assert(Shift <= LeadingZeros);
   assert(Shift == LeadingZeros || NewE == ScaledNumbers::MaxScale);

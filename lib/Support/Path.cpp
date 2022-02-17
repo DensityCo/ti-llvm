@@ -22,9 +22,6 @@
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
-#ifdef _SYS_BIOS
-#undef LLVM_ON_UNIX
-#endif
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <unistd.h>

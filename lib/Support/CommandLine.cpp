@@ -152,8 +152,6 @@ void OptionCategory::registerCategory() {
 static void GetOptionInfo(SmallVectorImpl<Option *> &PositionalOpts,
                           SmallVectorImpl<Option *> &SinkOpts,
                           StringMap<Option *> &OptionsMap) {
-#ifndef _SYS_BIOS
-
   bool HadErrors = false;
   SmallVector<const char *, 16> OptionNames;
   Option *CAOpt = nullptr; // The ConsumeAfter option if it exists.
@@ -201,7 +199,6 @@ static void GetOptionInfo(SmallVectorImpl<Option *> &PositionalOpts,
   // linked LLVM distribution.
   if (HadErrors)
     report_fatal_error("inconsistency in registered CommandLine options");
-#endif
 }
 
 /// LookupOption - Lookup the option specified by the specified option on the
@@ -759,7 +756,7 @@ void cl::ParseEnvironmentOptions(const char *progName, const char *envVar,
   // Check args.
   assert(progName && "Program name not specified");
   assert(envVar && "Environment variable name missing");
-#ifndef _SYS_BIOS
+
   // Get the environment variable they want us to parse options out of.
   const char *envValue = getenv(envVar);
   if (!envValue)
@@ -776,7 +773,6 @@ void cl::ParseEnvironmentOptions(const char *progName, const char *envVar,
   TokenizeGNUCommandLine(envValue, Saver, newArgv);
   int newArgc = static_cast<int>(newArgv.size());
   ParseCommandLineOptions(newArgc, &newArgv[0], Overview);
-#endif
 }
 
 void cl::ParseCommandLineOptions(int argc, const char *const *argv,
@@ -785,7 +781,6 @@ void cl::ParseCommandLineOptions(int argc, const char *const *argv,
   SmallVector<Option *, 4> PositionalOpts;
   SmallVector<Option *, 4> SinkOpts;
   StringMap<Option *> Opts;
-#ifndef _SYS_BIOS
   GetOptionInfo(PositionalOpts, SinkOpts, Opts);
 
   assert((!Opts.empty() || !PositionalOpts.empty()) && "No options specified!");
@@ -1088,7 +1083,6 @@ void cl::ParseCommandLineOptions(int argc, const char *const *argv,
   // If we had an error processing our arguments, don't let the program execute
   if (ErrorParsing)
     exit(1);
-#endif
 }
 
 //===----------------------------------------------------------------------===//
@@ -1832,10 +1826,20 @@ void cl::AddExtraVersionPrinter(void (*func)()) {
 void cl::getRegisteredOptions(StringMap<Option *> &Map) {
   // Get all the options.
   SmallVector<Option *, 4> PositionalOpts; // NOT USED
-  SmallVector<Option *, 4> SinkOpts; // NOT USED
+  SmallVector<Option *, 4> SinkOpts;       // NOT USED
   assert(Map.size() == 0 && "StringMap must be empty");
   GetOptionInfo(PositionalOpts, SinkOpts, Map);
   return;
+}
+
+void cl::HideUnrelatedOptions(cl::OptionCategory &Category) {
+  StringMap<cl::Option *> Options;
+  cl::getRegisteredOptions(Options);
+  for (auto &I : Options) {
+    if (I.second->Category != &Category && I.first() != "help" &&
+        I.first() != "version")
+      I.second->setHiddenFlag(cl::ReallyHidden);
+  }
 }
 
 void LLVMParseCommandLineOptions(int argc, const char *const *argv,

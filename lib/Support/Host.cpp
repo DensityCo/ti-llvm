@@ -21,9 +21,7 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include <string.h>
-#ifdef _SYS_BIOS
-#undef LLVM_ON_UNIX
-#endif
+
 // Include the platform-specific parts of this class.
 #ifdef LLVM_ON_UNIX
 #include "Unix/Host.inc"

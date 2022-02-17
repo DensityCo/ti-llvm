@@ -48,13 +48,9 @@ TimeValue::normalize( void ) {
 }
 
 /// Include the platform-specific portion of TimeValue class
-#ifdef _SYS_BIOS
-#include "Bios/TimeValue.inc"
-#else
 #ifdef LLVM_ON_UNIX
 #include "Unix/TimeValue.inc"
 #endif
 #ifdef LLVM_ON_WIN32
 #include "Windows/TimeValue.inc"
-#endif
 #endif

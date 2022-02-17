@@ -60,11 +60,9 @@ ProcessInfo sys::ExecuteNoWait(StringRef Program, const char **args,
 }
 
 // Include the platform-specific parts of this class.
-#ifndef _SYS_BIOS
 #ifdef LLVM_ON_UNIX
 #include "Unix/Program.inc"
 #endif
 #ifdef LLVM_ON_WIN32
 #include "Windows/Program.inc"
-#endif
 #endif

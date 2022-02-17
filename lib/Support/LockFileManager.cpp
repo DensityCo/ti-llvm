@@ -58,7 +58,7 @@ LockFileManager::readLockFile(StringRef LockFileName) {
 }
 
 bool LockFileManager::processStillExecuting(StringRef Hostname, int PID) {
-#if LLVM_ON_UNIX && !defined(__ANDROID__) && !defined(_SYS_BIOS)
+#if LLVM_ON_UNIX && !defined(__ANDROID__)
   char MyHostname[256];
   MyHostname[255] = 0;
   MyHostname[0] = 0;
@@ -100,7 +100,7 @@ LockFileManager::LockFileManager(StringRef FileName)
   {
     raw_fd_ostream Out(UniqueLockFileID, /*shouldClose=*/true);
 
-#if LLVM_ON_UNIX && !defined(_SYS_BIOS)
+#if LLVM_ON_UNIX
     // FIXME: move getpid() call into LLVM
     char hostname[256];
     hostname[255] = 0;
@@ -196,7 +196,7 @@ LockFileManager::WaitForUnlockResult LockFileManager::waitForUnlock() {
     // lock file is deleted?
 #if LLVM_ON_WIN32
     Sleep(Interval);
-#elseif !defined(_SYS_BIOS)
+#else
     nanosleep(&Interval, nullptr);
 #endif
     bool LockFileJustDisappeared = false;

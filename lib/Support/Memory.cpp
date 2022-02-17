@@ -15,9 +15,7 @@
 #include "llvm/Support/Memory.h"
 #include "llvm/Config/config.h"
 #include "llvm/Support/Valgrind.h"
-#ifdef _SYS_BIOS
-#undef LLVM_ON_UNIX
-#endif
+
 // Include the platform-specific parts of this class.
 #ifdef LLVM_ON_UNIX
 #include "Unix/Memory.inc"

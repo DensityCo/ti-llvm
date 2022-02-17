@@ -115,7 +115,7 @@ namespace llvm {
   /// It is legal for a client to make multiple calls to this function.
   inline bool InitializeNativeTarget() {
   // If we have a native target, initialize it to ensure it is linked in.
-#if defined(LLVM_NATIVE_TARGET) && (!defined _SYS_BIOS)
+#ifdef LLVM_NATIVE_TARGET
     LLVM_NATIVE_TARGETINFO();
     LLVM_NATIVE_TARGET();
     LLVM_NATIVE_TARGETMC();
@@ -129,7 +129,7 @@ namespace llvm {
   /// this function to initialize the native target asm printer.
   inline bool InitializeNativeTargetAsmPrinter() {
   // If we have a native target, initialize the corresponding asm printer.
-#if (defined LLVM_NATIVE_ASMPRINTER)&& (!defined _SYS_BIOS)
+#ifdef LLVM_NATIVE_ASMPRINTER
     LLVM_NATIVE_ASMPRINTER();
     return false;
 #else
@@ -141,7 +141,7 @@ namespace llvm {
   /// this function to initialize the native target asm parser.
   inline bool InitializeNativeTargetAsmParser() {
   // If we have a native target, initialize the corresponding asm parser.
-#if (defined LLVM_NATIVE_ASMPARSER) && (!defined _SYS_BIOS)
+#ifdef LLVM_NATIVE_ASMPARSER
     LLVM_NATIVE_ASMPARSER();
     return false;
 #else
@@ -153,7 +153,7 @@ namespace llvm {
   /// this function to initialize the native target disassembler.
   inline bool InitializeNativeTargetDisassembler() {
   // If we have a native target, initialize the corresponding disassembler.
-#if (defined LLVM_NATIVE_DISASSEMBLER)  && (!defined _SYS_BIOS)
+#ifdef LLVM_NATIVE_DISASSEMBLER
     LLVM_NATIVE_DISASSEMBLER();
     return false;
 #else

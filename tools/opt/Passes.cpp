@@ -15,8 +15,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "Passes.h"
+#include "llvm/Analysis/AssumptionCache.h"
 #include "llvm/Analysis/CGSCCPassManager.h"
 #include "llvm/Analysis/LazyCallGraph.h"
+#include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/IRPrintingPasses.h"
 #include "llvm/IR/PassManager.h"

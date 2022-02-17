@@ -60,7 +60,7 @@ void Win64Exception::beginFunction(const MachineFunction *MF) {
 
   const TargetLoweringObjectFile &TLOF = Asm->getObjFileLowering();
   unsigned PerEncoding = TLOF.getPersonalityEncoding();
-  const Function *Per = MMI->getPersonalities()[MMI->getPersonalityIndex()];
+  const Function *Per = MF->getMMI().getPersonality();
 
   shouldEmitPersonality = hasLandingPads &&
     PerEncoding != dwarf::DW_EH_PE_omit && Per;
@@ -103,18 +103,13 @@ void Win64Exception::endFunction(const MachineFunction *) {
     // Emit an UNWIND_INFO struct describing the prologue.
     Asm->OutStreamer.EmitWinEHHandlerData();
 
-    // Emit either MSVC-compatible tables or the usual Itanium-style LSDA after
-    // the UNWIND_INFO struct.
-    if (Asm->MAI->getExceptionHandlingType() == ExceptionHandling::MSVC) {
-      const Function *Per = MMI->getPersonalities()[MMI->getPersonalityIndex()];
-      if (Per->getName() == "__C_specific_handler")
-        emitCSpecificHandlerTable();
-      else
-        report_fatal_error(Twine("unexpected personality function: ") +
-                           Per->getName());
-    } else {
+    // Emit the tables appropriate to the personality function in use. If we
+    // don't recognize the personality, assume it uses an Itanium-style LSDA.
+    const Function *Per = MMI->getPersonality();
+    if (Per && Per->getName() == "__C_specific_handler")
+      emitCSpecificHandlerTable();
+    else
       emitExceptionTable();
-    }
 
     Asm->OutStreamer.PopSection();
   }
@@ -150,7 +145,7 @@ const MCSymbolRefExpr *Win64Exception::createImageRel32(const MCSymbol *Value) {
 ///     struct Entry {
 ///       imagerel32 LabelStart;
 ///       imagerel32 LabelEnd;
-///       imagerel32 FilterOrFinally;  // Zero means catch-all.
+///       imagerel32 FilterOrFinally;  // One means catch-all.
 ///       imagerel32 LabelLPad;        // Zero means __finally.
 ///     } Entries[NumEntries];
 ///   };
@@ -246,7 +241,7 @@ void Win64Exception::emitCSpecificHandlerTable() {
         if (TI) // Emit the filter function pointer.
           Asm->OutStreamer.EmitValue(createImageRel32(Asm->getSymbol(TI)), 4);
         else  // Otherwise, this is a "catch i8* null", or catch all.
-          Asm->OutStreamer.EmitIntValue(0, 4);
+          Asm->OutStreamer.EmitIntValue(1, 4);
       }
       Asm->OutStreamer.EmitValue(createImageRel32(ClauseLabel), 4);
     }

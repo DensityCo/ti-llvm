@@ -89,13 +89,7 @@ else(WIN32)
       set(LLVM_HAVE_LINK_VERSION_SCRIPT 1)
     endif(APPLE)
   else(UNIX)
-    if(BUILD_OS STREQUAL "SYS_BIOS")
-      set(LLVM_ON_UNIX 1)
-      set(LTDL_SHLIB_EXT ".a")
-      set(EXEEXT ".exe")
-    else(BUILD_OS STREQUAL "SYS_BIOS")
-      MESSAGE(SEND_ERROR "Unable to determine platform")
-    endif(BUILD_OS STREQUAL "SYS_BIOS")
+    MESSAGE(SEND_ERROR "Unable to determine platform")
   endif(UNIX)
 endif(WIN32)
 
@@ -109,6 +103,15 @@ if(APPLE)
   # Darwin-specific linker flags for loadable modules.
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-flat_namespace -Wl,-undefined -Wl,suppress")
 endif()
+
+# Pass -Wl,-z,defs. This makes sure all symbols are defined. Otherwise a DSO
+# build might work on ELF but fail on MachO/COFF.
+if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR WIN32 OR
+        ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") AND
+   NOT LLVM_USE_SANITIZER)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs")
+endif()
+
 
 function(append value)
   foreach(variable ${ARGN})
@@ -336,7 +339,7 @@ elseif( LLVM_COMPILER_IS_GCC_COMPATIBLE )
   else()
     check_cxx_compiler_flag("-std=c++11" CXX_SUPPORTS_CXX11)
     if (CXX_SUPPORTS_CXX11)
-      if (CYGWIN OR MINGW OR BUILD_OS STREQUAL "SYS_BIOS")
+      if (CYGWIN OR MINGW)
         # MinGW and Cygwin are a bit stricter and lack things like
         # 'strdup', 'stricmp', etc in c++11 mode.
         append("-std=gnu++11" CMAKE_CXX_FLAGS)

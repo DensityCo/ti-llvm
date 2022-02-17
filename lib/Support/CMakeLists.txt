@@ -27,10 +27,6 @@ if( NOT MSVC )
   endif( MINGW )
 endif( NOT MSVC )
 
-if( ${BUILD_OS} MATCHES "SYS_BIOS" )
-set(SYS_BIOS_SRC_FILES "Bios/FileSystem.cpp")
-endif( ${BUILD_OS} MATCHES "SYS_BIOS" )
-
 add_llvm_library(LLVMSupport
   APFloat.cpp
   APInt.cpp
@@ -124,7 +120,6 @@ add_llvm_library(LLVMSupport
   TimeValue.cpp
   Valgrind.cpp
   Watchdog.cpp
-  ${SYS_BIOS_SRC_FILES}
 
   ADDITIONAL_HEADERS
   Unix/Host.inc
